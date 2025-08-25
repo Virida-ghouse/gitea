@@ -31,12 +31,14 @@ La configuration est générée dynamiquement par `start.sh` au démarrage pour 
 ### Prérequis
 1. Compte CleverCloud avec accès à l'organisation
 2. [clever-tools](https://github.com/clevercloud/clever-tools) (CLI CleverCloud) installé (`clever`)
-3. PostgreSQL addon créé
+3. [Git LFS](https://git-lfs.github.io/) installé (`git lfs`) pour gérer le binaire Gitea
+4. PostgreSQL addon créé
 
 ### Étapes de déploiement
 
-1. **Cloner le repo**
+1. **Cloner le repo avec Git LFS**
    ```bash
+   git lfs install
    git clone <repo-url>
    cd gitea
    ```
@@ -103,6 +105,47 @@ clever addon list  # Voir les addons liés
 ### Variables d'environnement manquantes
 - Vérifier avec `clever env` que toutes les variables sont définies
 - Régénérer les secrets si nécessaire
+
+### Problème avec Git LFS
+- Erreur "File gitea is X.XX MB; this exceeds GitHub's file size limit" : Git LFS n'est pas configuré
+- Solution : Installer Git LFS et re-cloner le repository
+  ```bash
+  git lfs install
+  git lfs track "gitea"
+  git add .gitattributes
+  git add gitea
+  git commit -m "Track gitea binary with LFS"
+  git push
+  ```
+
+## Git LFS (Large File Storage)
+
+Le binaire Gitea (~113MB) dépasse la limite de fichier GitHub (100MB). Il est donc géré via Git LFS.
+
+### Installation de Git LFS
+```bash
+# Sur Ubuntu/Debian
+sudo apt install git-lfs
+
+# Sur macOS
+brew install git-lfs
+
+# Sur Windows
+# Télécharger depuis https://git-lfs.github.io/
+```
+
+### Configuration initiale (déjà fait dans ce repo)
+```bash
+git lfs install
+git lfs track "gitea"
+git add .gitattributes gitea
+git commit -m "Track gitea binary with Git LFS"
+```
+
+### Vérification
+```bash
+git lfs ls-files  # Doit montrer le fichier gitea
+```
 
 ## Support
 
