@@ -23,7 +23,8 @@ Instance Gitea déployée sur CleverCloud avec un runtime Linux pour des perform
 La configuration est générée dynamiquement par `start.sh` au démarrage pour injecter les variables d'environnement CleverCloud :
 
 - **Base de données** : PostgreSQL addon avec variables `POSTGRESQL_ADDON_*`
-- **Sécurité** : Clés secrètes via variables d'environnement `GITEA_*`
+- **Connection pooling** : Support Pgpool-II pour éviter les erreurs de connexion lors du scaling
+- **Sécurité** : Clés secrètes via variables d'environnement `GITEA_*`  
 - **Serveur** : Port via `${PORT}` (injecté par CleverCloud)
 
 ## Déploiement sur CleverCloud
@@ -97,6 +98,7 @@ clever addon list  # Voir les addons liés
 ### Erreur de connexion base de données
 - Vérifier que l'addon PostgreSQL est bien lié
 - Consulter les logs pour les détails de connexion
+- En cas d'erreur "too many connections" lors du scaling : voir la configuration Pgpool-II dans `PGPOOL_CONFIG.md`
 
 ### Erreur de démarrage
 - Vérifier les permissions du binaire `gitea` (doit être exécutable)

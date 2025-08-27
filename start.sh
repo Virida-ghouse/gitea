@@ -13,6 +13,18 @@ mkdir -p data/indexers
 mkdir -p logs
 
 echo "Génération du fichier de configuration dynamique..."
+
+# Déterminer la configuration de connexion DB
+if [ -n "${CC_PGPOOL_SOCKET_PATH}" ]; then
+    echo "Utilisation de Pgpool-II via socket Unix: ${CC_PGPOOL_SOCKET_PATH}"
+    DB_HOST="${CC_PGPOOL_SOCKET_PATH}"
+    DB_PORT=""
+else
+    echo "Connexion PostgreSQL directe"
+    DB_HOST="${POSTGRESQL_ADDON_HOST}:${POSTGRESQL_ADDON_PORT}"
+    DB_PORT=""
+fi
+
 # Générer app.ini avec les vraies valeurs
 cat > custom/conf/app.ini << EOF
 APP_NAME = Gitea
@@ -27,11 +39,14 @@ START_SSH_SERVER = false
 
 [database]
 DB_TYPE = postgres
-HOST = ${POSTGRESQL_ADDON_HOST}:${POSTGRESQL_ADDON_PORT}
+HOST = ${DB_HOST}
 NAME = ${POSTGRESQL_ADDON_DB}
 USER = ${POSTGRESQL_ADDON_USER}
 PASSWD = ${POSTGRESQL_ADDON_PASSWORD}
 SSL_MODE = require
+MAX_OPEN_CONNS = 5
+MAX_IDLE_CONNS = 2
+CONN_MAX_LIFETIME = 300s
 
 [security]
 INSTALL_LOCK = true
