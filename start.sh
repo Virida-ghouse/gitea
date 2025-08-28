@@ -11,6 +11,7 @@ mkdir -p data/avatars
 mkdir -p data/repo-avatars
 mkdir -p data/indexers
 mkdir -p logs
+mkdir -p custom/conf
 
 echo "Génération du fichier de configuration dynamique..."
 
