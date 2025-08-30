@@ -123,10 +123,21 @@ if [ ! -f "./gitea" ]; then
     exit 1
 fi
 
+# Vérifier que c'est un binaire et pas un pointeur LFS
+if file ./gitea | grep -q "ASCII text"; then
+    echo "ERREUR: ./gitea est un pointeur Git LFS, pas un binaire!"
+    echo "Contenu du fichier:"
+    head -5 ./gitea
+    echo "Assurez-vous que 'git lfs pull' a été exécuté."
+    exit 1
+fi
+
 if [ ! -x "./gitea" ]; then
     echo "ERREUR: ./gitea n'est pas exécutable!"
     exit 1
 fi
+
+echo "✓ Binaire Gitea valide ($(file ./gitea | cut -d: -f2))"
 
 echo "=== RESSOURCES SYSTÈME ==="
 echo "RAM totale: $(free -h | grep ^Mem | awk '{print $2}')"

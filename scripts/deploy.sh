@@ -9,10 +9,12 @@ echo ""
 echo "1/4 Configuration du scaling pour démarrage..."
 ./scripts/scale-for-startup.sh
 
-# 2. Configuration du hook de succès pour scale down automatique
+# 2. Configuration des hooks
 echo ""
-echo "2/4 Configuration du hook de réduction automatique..."
+echo "2/4 Configuration des hooks..."
+clever env set CC_PRE_RUN_HOOK "git lfs pull"
 clever env set CC_RUN_SUCCEEDED_HOOK "./scripts/scale-for-runtime.sh"
+echo "✓ Hook LFS configuré pour télécharger les binaires"
 echo "✓ Hook configuré pour scale down après succès"
 
 # 3. Déploiement avec suivi des logs
