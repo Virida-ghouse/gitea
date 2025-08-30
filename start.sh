@@ -15,6 +15,15 @@ mkdir -p custom/conf
 
 echo "Génération du fichier de configuration dynamique..."
 
+# Debug des variables d'environnement critiques
+echo "=== DEBUG VARIABLES ==="
+echo "PORT: ${PORT:-NOT_SET}"
+echo "POSTGRESQL_ADDON_HOST: ${POSTGRESQL_ADDON_HOST:-NOT_SET}"
+echo "POSTGRESQL_ADDON_DB: ${POSTGRESQL_ADDON_DB:-NOT_SET}"
+echo "GITEA_SECRET_KEY: ${GITEA_SECRET_KEY:+SET}"
+echo "CC_PGPOOL_SOCKET_PATH: ${CC_PGPOOL_SOCKET_PATH:-NOT_SET}"
+echo "========================"
+
 # Déterminer la configuration de connexion DB
 if [ -n "${CC_PGPOOL_SOCKET_PATH}" ]; then
     echo "Utilisation de Pgpool-II via socket Unix: ${CC_PGPOOL_SOCKET_PATH}"
@@ -98,5 +107,20 @@ DISABLE_REGULAR_ORG_CREATION = true
 EOF
 
 echo "Configuration générée, démarrage de Gitea..."
+
+# Vérifier que Gitea existe et est exécutable
+if [ ! -f "./gitea" ]; then
+    echo "ERREUR: ./gitea n'existe pas!"
+    exit 1
+fi
+
+if [ ! -x "./gitea" ]; then
+    echo "ERREUR: ./gitea n'est pas exécutable!"
+    exit 1
+fi
+
+echo "Tentative de démarrage de Gitea..."
+echo "Commande: ./gitea web --config custom/conf/app.ini"
+
 # Démarrer Gitea
 exec ./gitea web --config custom/conf/app.ini
