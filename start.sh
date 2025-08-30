@@ -35,11 +35,20 @@ else
     DB_PORT=""
 fi
 
+# Déterminer l'utilisateur de runtime
+if [ -n "${CC_INSTANCE_ID}" ]; then
+    # Sur Clever Cloud, l'utilisateur est toujours 'bas'
+    RUN_USER="bas"
+else
+    # En local, utiliser l'utilisateur actuel
+    RUN_USER=$(whoami)
+fi
+
 # Générer app.ini avec les vraies valeurs
 cat > custom/conf/app.ini << EOF
 APP_NAME = Gitea
 RUN_MODE = prod
-RUN_USER = bas
+RUN_USER = ${RUN_USER}
 
 [server]
 HTTP_ADDR = 0.0.0.0
