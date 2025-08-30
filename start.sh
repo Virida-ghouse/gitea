@@ -128,8 +128,15 @@ if [ ! -x "./gitea" ]; then
     exit 1
 fi
 
+echo "=== RESSOURCES SYSTÈME ==="
+echo "RAM totale: $(free -h | grep ^Mem | awk '{print $2}')"
+echo "RAM disponible: $(free -h | grep ^Mem | awk '{print $7}')"
+echo "CPU cores: $(nproc)"
+echo "Espace disque: $(df -h . | tail -1 | awk '{print $4}' | sed 's/^/disponible: /')"
+echo "=========================="
+
 echo "Tentative de démarrage de Gitea..."
 echo "Commande: ./gitea web --config custom/conf/app.ini"
 
-# Démarrer Gitea
-exec ./gitea web --config custom/conf/app.ini
+# Démarrer Gitea avec un timeout pour éviter les hangs
+timeout 300 ./gitea web --config custom/conf/app.ini
