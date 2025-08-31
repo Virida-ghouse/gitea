@@ -2,36 +2,42 @@
 set -e
 
 echo "=== Déploiement Intelligent Gitea ==="
-echo "Scaling automatique : startup (S-L) → runtime (pico-M)"
+echo "Workflow : Scale UP → Deploy → Vérification → Scale DOWN"
 echo ""
 
 # 1. Configuration du scaling pour le démarrage
-echo "1/4 Configuration du scaling pour démarrage..."
+echo "1/4 🚀 Scale UP pour démarrage optimal..."
 ./scripts/scale-for-startup.sh
 
-# 2. Configuration des hooks
+# 2. Déploiement
 echo ""
-echo "2/4 Configuration des hooks..."
-clever env set CC_PRE_RUN_HOOK "git lfs pull"
-clever env set CC_RUN_SUCCEEDED_HOOK "./scripts/scale-for-runtime.sh"
-echo "✓ Hook LFS configuré pour télécharger les binaires"
-echo "✓ Hook configuré pour scale down après succès"
-
-# 3. Déploiement avec suivi des logs
-echo ""
-echo "3/4 Déploiement en cours..."
+echo "2/4 📦 Déploiement en cours..."
 clever deploy --follow
 
-# 4. Affichage du statut final
+# 3. Vérification que l'application démarre
 echo ""
-echo "4/4 Vérification du statut final..."
-sleep 5
-clever status
+echo "3/4 ⏳ Vérification du démarrage..."
+echo "Attente de la stabilisation de l'application (60s)..."
+sleep 60
+
+# Vérifier le statut de l'application
+APP_STATUS=$(clever status --format json | jq -r '.state')
+if [ "$APP_STATUS" = "UP" ]; then
+    echo "✅ Application démarrée avec succès !"
+else
+    echo "⚠️ Application en cours de démarrage (status: $APP_STATUS)"
+    echo "Attente supplémentaire de 30s..."
+    sleep 30
+fi
+
+# 4. Scale DOWN pour économiser les ressources
+echo ""
+echo "4/4 💰 Scale DOWN pour économie..."
+./scripts/scale-for-runtime.sh
 
 echo ""
-echo "=== Déploiement Terminé ==="
-echo "🚀 Application déployée avec scaling intelligent"
-echo "📊 Monitoring : clever logs"
-echo "🔧 Status : clever status"
-echo ""
-echo "Le scaling se réduira automatiquement après démarrage réussi."
+echo "=== 🎉 Déploiement Intelligent Terminé ==="
+echo "✅ Gitea déployé avec scaling optimal"
+echo "📊 Logs temps réel : clever logs"
+echo "🔧 Status actuel : clever status"
+echo "🌐 Ouvrir l'app : clever open"
